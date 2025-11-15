@@ -1,5 +1,5 @@
 #include <iostream>
-#include <unordered_map>
+#include <map>
 
 
 /**
@@ -7,18 +7,20 @@
  * inputs to be redirected from an input file. The program executes an aggregation of all matching prices
  * to their total volume in the orderbook, simulating a real-time data stream coming from exchanges.
  */
-int main(void) {
-    // Using unordered_map because this is a constant time insertion. An alternative I considered was to use
-    // std::map, which is implemented as a Red-Black Tree, for the ordering guarantee, but since the order would
-    // not matter in the real world, and the red-black tree has a longer look-up time (O(log n)), I opted for the
-    // unordered_map.
-    std::unordered_map<double, int> priceToVolumeMap {};
+int main() {
+    // Only consider the C++ buffering and disable the C synchronization
+    std::ios::sync_with_stdio(false);
+    // Disable automatic flushing of std::cout before reading from std::cin.
+    std::cin.tie(nullptr);
+
+    // Use std::map for the ordering benefit, and accept the cost of O log(n) lookups and potential tree rebalancing.
+    std::map<double, int> priceToVolumeMap {};
     double orderPrice;
-    unsigned int orderVolume;
+    int orderVolume;
 
     // Only considers pairs
     while (std::cin >> orderPrice && std::cin >> orderVolume) {
-	priceToVolumeMap.emplace(orderPrice, orderVolume);
+	priceToVolumeMap[orderPrice] += orderVolume;
     }
 
     for (const auto& [price, volume] : priceToVolumeMap) {
